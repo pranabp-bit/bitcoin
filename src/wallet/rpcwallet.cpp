@@ -588,6 +588,10 @@ static RPCHelpMan walletestimatefee()
     UniValue temp(UniValue::VNULL);
 
     SetFeeEstimateMode(*pwallet, coin_control, /* conf_target */ request.params[0], /* estimate_mode */ request.params[1], /* fee_rate */temp , /* override_min_fee */ false);
+<<<<<<< HEAD
+=======
+
+>>>>>>> removed trailing whitespace
     UniValue result(UniValue::VOBJ);
     UniValue errors(UniValue::VARR);
     UniValue reas(UniValue::VSTR);
