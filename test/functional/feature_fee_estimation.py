@@ -252,13 +252,7 @@ class EstimateFeeTest(BitcoinTestFramework):
         self.connect_nodes(2, 1)
 
         self.sync_all()
-        self.nodes[1].createwallet(wallet_name="w1")
-        w1 = self.nodes[1].get_wallet_rpc("w1")
-        xvd=w1.walletestimatefee(1)
-        for x in range (1,26):
-            print(self.nodes[1].estimatesmartfee(x))
-            print(w1.walletestimatefee(x),self.nodes[1].getmempoolinfo()['mempoolminfee'])
-        # check that xvd==0.002(fallbackfee)
+
         self.fees_per_kb = []
         self.memutxo = []
         self.confutxo = self.txouts  # Start with the set of confirmed txouts after splitting
@@ -269,17 +263,12 @@ class EstimateFeeTest(BitcoinTestFramework):
             # Create transactions and mine 10 small blocks with node 2, but create txs faster than we can mine
             self.transact_and_mine(10, self.nodes[2])
             check_estimates(self.nodes[1], self.fees_per_kb)
-            for x in range (1,26):
-                print(self.nodes[1].estimatesmartfee(x))
-                print(w1.walletestimatefee(x),self.nodes[1].getmempoolinfo()['mempoolminfee'])
+
             self.log.info("Creating transactions and mining them at a block size that is just big enough")
             # Generate transactions while mining 10 more blocks, this time with node1
             # which mines blocks with capacity just above the rate that transactions are being created
             self.transact_and_mine(10, self.nodes[1])
             check_estimates(self.nodes[1], self.fees_per_kb)
-            for x in range (1,26):
-                print(self.nodes[1].estimatesmartfee(x))
-                print(w1.walletestimatefee(x),self.nodes[1].getmempoolinfo()['mempoolminfee'])
 
         # Finish by mining a normal-sized block:
         while len(self.nodes[1].getrawmempool()) > 0:
@@ -288,12 +277,7 @@ class EstimateFeeTest(BitcoinTestFramework):
         self.sync_blocks(self.nodes[0:3], wait=.1)
         self.log.info("Final estimates after emptying mempools")
         check_estimates(self.nodes[1], self.fees_per_kb)
-        self.restart_node(1, extra_args=['-minrelaytxfee=0.00025'])
-        self.nodes[1].createwallet(wallet_name="w2")
-        w2 = self.nodes[1].get_wallet_rpc("w2")
-        for x in range (1,26):
-            print(self.nodes[1].estimatesmartfee(x))
-            print(w2.walletestimatefee(x),self.nodes[1].getmempoolinfo()['minrelaytxfee'])
+
         self.log.info("Testing that fee estimation is disabled in blocksonly.")
         self.restart_node(0, ["-blocksonly"])
         assert_raises_rpc_error(-32603, "Fee estimation disabled",
