@@ -165,6 +165,8 @@ def check_walletestimates(w, node):
             assert_equal(w.walletestimatefee(x)['reason'], 'estimatesmartfee')
         else:
             assert_equal(walletEstimateFee['feerate'], mempoolMinFee)
+        print(estimateSmartFee)
+        print(walletEstimateFee, mempoolMinFee)
 
 class EstimateFeeTest(BitcoinTestFramework):
     def set_test_params(self):

@@ -1097,7 +1097,8 @@ static RPCHelpMan estimatesmartfee()
     RPCTypeCheckArgument(request.params[0], UniValue::VNUM);
 
     CBlockPolicyEstimator& fee_estimator = EnsureAnyFeeEstimator(request.context);
-
+    NodeContext& node = EnsureAnyNodeContext(request.context);
+    const CTxMemPool& mempool = EnsureMemPool(node);
     unsigned int max_target = fee_estimator.HighestTargetTracked(FeeEstimateHorizon::LONG_HALFLIFE);
     unsigned int conf_target = ParseConfirmTarget(request.params[0], max_target);
     bool conservative = true;
@@ -1113,6 +1114,12 @@ static RPCHelpMan estimatesmartfee()
     UniValue errors(UniValue::VARR);
     FeeCalculation feeCalc;
     CFeeRate feeRate = fee_estimator.estimateSmartFee(conf_target, &feeCalc, conservative);
+    CFeeRate min_mempool_feerate = mempool.GetMinFee(gArgs.GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000);
+    printf("estiesti ");
+        if (feeRate < min_mempool_feerate) {
+            printf("!@#$%^&*()");
+            feeRate = min_mempool_feerate;
+        }
     if (feeRate != CFeeRate(0)) {
         result.pushKV("feerate", ValueFromAmount(feeRate.GetFeePerK()));
     } else {
