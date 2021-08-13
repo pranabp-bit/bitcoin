@@ -1115,11 +1115,13 @@ static RPCHelpMan estimatesmartfee()
     FeeCalculation feeCalc;
     CFeeRate feeRate = fee_estimator.estimateSmartFee(conf_target, &feeCalc, conservative);
     CFeeRate min_mempool_feerate = mempool.GetMinFee(gArgs.GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000);
-    printf("estiesti ");
-        if (feeRate < min_mempool_feerate) {
-            printf("!@#$%^&*()");
-            feeRate = min_mempool_feerate;
-        }
+    if (feeRate < min_mempool_feerate) {
+        feeRate = min_mempool_feerate;
+    }
+    CFeeRate min_relay_feerate = ::minRelayTxFee;
+    if (feeRate < min_relay_feerate) {
+        feeRate = min_relay_feerate;
+    }
     if (feeRate != CFeeRate(0)) {
         result.pushKV("feerate", ValueFromAmount(feeRate.GetFeePerK()));
     } else {
